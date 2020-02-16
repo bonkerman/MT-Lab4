@@ -8,29 +8,12 @@
 
 'use strict';
 
-const snapshotButton = document.querySelector('button#snapshot');
 const filterSelect = document.querySelector('select#filter');
 const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
 let vc = null;
 let src = null;
 
-snapshotButton.onclick = function() {
-	if(filterSelect.value!="canny"){
-		canvas.className = filterSelect.value;
-  		canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-	} else {
-		canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-		let src = cv.imread('canvas');
-		let dst = new cv.Mat();
-		cv.cvtColor(src, src, cv.COLOR_RGB2GRAY, 0);
-		//cv.Canny(image, edges, threshold1, threshold2, apertureSize = 3, L2gradient = false)
-		cv.Canny(src, dst, 50, 60, 3, false);
-		cv.imshow('canvas', dst);
-		src.delete(); dst.delete();
-	}
-  
-};
 
 video.onloadeddata = () => {
 	canvas.width = video.videoWidth;
@@ -44,13 +27,21 @@ video.onloadeddata = () => {
 
 function processVideo(){
 		vc.read(src);
-		cv.imshow('canvas', src);
+		let result;
+		switch(filterSelect.value){
+			case 'canny': result = canny(src); break;
+			default: result = src; canvas.className = filterSelect.value;
+		}
+		cv.imshow('canvas', result);
 		requestAnimationFrame(processVideo);
 };
 
-filterSelect.onchange = function() {
-  video.className = filterSelect.value != "canny" ? filterSelect.value : "";
-
+function canny(src) {
+	let dst = new cv.Mat();
+    cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY);
+    cv.Canny(dst, dst, 218, 119,
+             3, false);
+    return dst;
 };
 
 const constraints = {
