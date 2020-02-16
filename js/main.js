@@ -35,6 +35,7 @@ function processVideo(){
 		let result;
 		switch(filterSelect.value){
 			case 'canny': result = canny(src); break;
+			case 'equalizeHist': result = equalizeHist(src); break;
 			default: result = src; canvas.className = filterSelect.value;
 		}
 		cv.imshow('canvas', result);
@@ -52,6 +53,14 @@ function canny(src) {
     	dst = src;
     }
     
+    return dst;
+};
+
+function equalizeHist(src) {
+	canvas.className = "none";
+	let dst = new cv.Mat();
+    cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY, 0);
+    cv.equalizeHist(dst, dst);
     return dst;
 };
 
@@ -89,9 +98,17 @@ function handleError(error) {
 };
 
 function stop() {
-	window.stream.getTracks().forEach(function(track) {
+	if($("#stopButton").text()=="START"){
+		navigator.mediaDevices.getUserMedia(constraints).then(handleSuccess).catch(handleError);
+		$("#stopButton").text("STOP");
+		src.delete();
+		vc.delete();
+	} else {
+		window.stream.getTracks().forEach(function(track) {
   		track.stop();
-	});
+		});
+		$("#stopButton").text("START");
+	}
 };
 
 
