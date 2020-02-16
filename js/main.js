@@ -7,7 +7,7 @@
  */
 
 'use strict';
-
+document.body.classList.add("loading");
 const filterSelect = document.querySelector('select#filter');
 const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
@@ -52,11 +52,13 @@ const constraints = {
 function handleSuccess(stream) {
   window.stream = stream; // make stream available to browser console
   video.srcObject = stream;
-}
+  document.body.classList.remove("loading");
+};
 
 function handleError(error) {
   console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
-}
+};
+
 
 
 
