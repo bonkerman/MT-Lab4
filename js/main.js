@@ -34,6 +34,10 @@ snapshotButton.onclick = function() {
   
 };
 
+video.onloadeddata = () => {
+	canvas.width = video.videoWidth;
+	canvas.height = video.videoHeight;
+};
 
 filterSelect.onchange = function() {
   video.className = filterSelect.value != "canny" ? filterSelect.value : "";
