@@ -9,10 +9,15 @@
 'use strict';
 document.body.classList.add("loading");
 const filterSelect = document.querySelector('select#filter');
+filterSelect.addEventListener("change", setupSliders);
 const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
 let vc = null;
 let src = null;
+
+const sliders = {
+	canny : [["lowThreshold", 0, 600, 300], ["highThreshold", 0, 600, 120]]
+};
 
 
 video.onloadeddata = () => {
@@ -37,11 +42,35 @@ function processVideo(){
 };
 
 function canny(src) {
+	canvas.className = "none";
 	let dst = new cv.Mat();
     cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY);
-    cv.Canny(dst, dst, 218, 119,
-             3, false);
+    try{
+    	cv.Canny(dst, dst, parseFloat($("#lowThreshold").val()), parseFloat($("#highThreshold").val()), 3, false);
+    }
+    catch{
+    	dst = src;
+    }
+    
     return dst;
+};
+
+function setupSliders(){
+	if(sliders[filterSelect.value]){
+		sliders[filterSelect.value].forEach((item)=>{
+			$("#sliders").append("<p>"+item[0]+"</p>").append($('<input>' ,{
+				type: "range",
+				id: item[0],
+				min: item[1],
+				max: item[2],
+				value: item[3]
+			}));
+		});
+		console.log($("#lowThreshold").val());
+	} else {
+		$("#sliders").empty();
+	}
+	
 };
 
 const constraints = {
@@ -59,6 +88,11 @@ function handleError(error) {
   console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
 };
 
+function stop() {
+	window.stream.getTracks().forEach(function(track) {
+  		track.stop();
+	});
+};
 
 
 
