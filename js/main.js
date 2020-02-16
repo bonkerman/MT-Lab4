@@ -10,12 +10,10 @@
 
 const snapshotButton = document.querySelector('button#snapshot');
 const filterSelect = document.querySelector('select#filter');
-
-// Put variables in global scope to make them available to the browser console.
 const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
-canvas.width = 480;
-canvas.height = 360;
+let vc = null;
+let src = null;
 
 snapshotButton.onclick = function() {
 	if(filterSelect.value!="canny"){
@@ -37,6 +35,17 @@ snapshotButton.onclick = function() {
 video.onloadeddata = () => {
 	canvas.width = video.videoWidth;
 	canvas.height = video.videoHeight;
+	video.height = video.videoHeight;
+	video.width = video.videoWidth;
+	vc = new cv.VideoCapture(video);
+	src = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC4);
+	processVideo();
+};
+
+function processVideo(){
+		vc.read(src);
+		cv.imshow('canvas', src);
+		requestAnimationFrame(processVideo);
 };
 
 filterSelect.onchange = function() {
@@ -57,5 +66,7 @@ function handleSuccess(stream) {
 function handleError(error) {
   console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
 }
+
+
 
 navigator.mediaDevices.getUserMedia(constraints).then(handleSuccess).catch(handleError);
