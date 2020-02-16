@@ -67,7 +67,7 @@
     <h1><a href="//webrtc.github.io/samples/" title="WebRTC samples homepage">WebRTC samples</a> <span>getUserMedia + CSS filters</span>
     </h1>
 
-    <video playsinline autoplay></video>
+    <video playsinline autoplay id="video"></video>
 
     <label for="filter">Filter: </label>
     <select id="filter">
@@ -76,11 +76,12 @@
         <option value="grayscale">Grayscale</option>
         <option value="invert">Invert</option>
         <option value="sepia">Sepia</option>
+        <option value="canny">Canny edge detection</option>
     </select>
 
     <button id="snapshot">Take snapshot</button>
 
-    <canvas></canvas>
+    <canvas id="canvas"></canvas>
 
     <p>Draw a frame from the getUserMedia video stream onto the canvas element, then apply CSS filters.</p>
 

@@ -12,18 +12,32 @@ const snapshotButton = document.querySelector('button#snapshot');
 const filterSelect = document.querySelector('select#filter');
 
 // Put variables in global scope to make them available to the browser console.
-const video = window.video = document.querySelector('video');
-const canvas = window.canvas = document.querySelector('canvas');
+const video = document.querySelector('video');
+const canvas = document.querySelector('canvas');
 canvas.width = 480;
 canvas.height = 360;
 
 snapshotButton.onclick = function() {
-  canvas.className = filterSelect.value;
-  canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+	if(filterSelect.value!="canny"){
+		canvas.className = filterSelect.value;
+  		canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+	} else {
+		canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+		let src = cv.imread('canvas');
+		let dst = new cv.Mat();
+		cv.cvtColor(src, src, cv.COLOR_RGB2GRAY, 0);
+		//cv.Canny(image, edges, threshold1, threshold2, apertureSize = 3, L2gradient = false)
+		cv.Canny(src, dst, 50, 60, 3, false);
+		cv.imshow('canvas', dst);
+		src.delete(); dst.delete();
+	}
+  
 };
 
+
 filterSelect.onchange = function() {
-  video.className = filterSelect.value;
+  video.className = filterSelect.value != "canny" ? filterSelect.value : "";
+
 };
 
 const constraints = {
