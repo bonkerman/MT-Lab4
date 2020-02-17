@@ -19,9 +19,13 @@
 </head>
 
 <body>
-<div id="container" class="hidden">
+<div class="container">
     <video playsinline autoplay id="video"></video>
-
+    <canvas id="canvas"></canvas>
+</div>
+<button id="stopButton" onclick="stop();">STOP</button>
+<div class="modal"></div>
+<div class="container">
     <select id="filter" size="6">
         <option value="none">None</option>
         <option value="blur">Blur</option>
@@ -30,16 +34,13 @@
         <option value="sepia">Sepia</option>
         <option value="canny">Canny edge detection</option>
         <option value="equalizeHist">Equalize histogram</option>
+        <option value="gaussianBlur">Gaussian blur</option>
     </select>
-    <canvas id="canvas"></canvas>
+    <div id="sliders"></div>
 </div>
-<button id="stopButton" onclick="stop();">STOP</button>
-<div class="modal"></div>
-<div id="sliders"></div>
+
 
 <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
-
-<script src="js/canny.js" async></script>
 <script src="js/main.js" async></script>
 
 </body>

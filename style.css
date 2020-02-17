@@ -23,8 +23,12 @@
     filter: sepia(1);
 }
 
-video {
-    object-fit: cover;
+video, canvas {
+    --width: 50%;
+    width: var(--width);
+    height: calc(var(--width) * 0.75);
+    margin: 0 0 20px 0;
+    vertical-align: top;
 }
 
 .modal {
@@ -50,4 +54,12 @@ body.loading {
 /* display the modal when loading class is added to body */
 body.loading .modal {
     display: block;
+}
+
+.container {
+    display: flex;
+}
+
+#sliders {
+    margin: 10px;
 }

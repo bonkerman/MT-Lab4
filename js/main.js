@@ -14,9 +14,11 @@ const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
 let vc = null;
 let src = null;
+let dst = null;
 
 const sliders = {
-	canny : [["lowThreshold", 0, 600, 300], ["highThreshold", 0, 600, 120]]
+	canny : [["lowThreshold", 0, 600, 300], ["highThreshold", 0, 600, 120]],
+	gaussianBlur : [["kernel", 7, 99, 30]]
 };
 
 
@@ -38,13 +40,21 @@ function processVideo(){
 			case 'equalizeHist': result = equalizeHist(src); break;
 			default: result = src; canvas.className = filterSelect.value;
 		}
+		dst != null ? dst.delete : "";
 		cv.imshow('canvas', result);
 		requestAnimationFrame(processVideo);
 };
 
+function gaussianBlur(src) {
+	canvas.className = "none";
+	dst = new cv.Mat();
+	cv.GaussianBlur(src, dst, {width: parseFloat($("#kernel").val()), height: parseFloat($("#kernel").val())}, 0, 0, cv.BORDER_DEFAULT);
+	return dst;
+}
+
 function canny(src) {
 	canvas.className = "none";
-	let dst = new cv.Mat();
+	dst = new cv.Mat();
     cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY);
     try{
     	cv.Canny(dst, dst, parseFloat($("#lowThreshold").val()), parseFloat($("#highThreshold").val()), 3, false);
@@ -58,24 +68,26 @@ function canny(src) {
 
 function equalizeHist(src) {
 	canvas.className = "none";
-	let dst = new cv.Mat();
+	dst = new cv.Mat();
     cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY, 0);
     cv.equalizeHist(dst, dst);
     return dst;
 };
 
 function setupSliders(){
+		$("#sliders").empty();
 	if(sliders[filterSelect.value]){
 		sliders[filterSelect.value].forEach((item)=>{
-			$("#sliders").append("<p>"+item[0]+"</p>").append($('<input>' ,{
+			$("#sliders").append("<p>"+item[0]+": <span>"+item[3]+"</span></p>").append($('<input>' ,{
 				type: "range",
 				id: item[0],
 				min: item[1],
 				max: item[2],
 				value: item[3]
-			}));
+			})).on("change",(e)=>{
+				$(e.target).prev().find("span").text(e.target.value);
+			});
 		});
-		console.log($("#lowThreshold").val());
 	} else {
 		$("#sliders").empty();
 	}
@@ -95,6 +107,7 @@ function handleSuccess(stream) {
 
 function handleError(error) {
   console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
+  navigator.mediaDevices.getDisplayMedia({ video: true }).then(handleSuccess).catch(handleError);
 };
 
 function stop() {
@@ -102,7 +115,6 @@ function stop() {
 		navigator.mediaDevices.getUserMedia(constraints).then(handleSuccess).catch(handleError);
 		$("#stopButton").text("STOP");
 		src.delete();
-		vc.delete();
 	} else {
 		window.stream.getTracks().forEach(function(track) {
   		track.stop();
@@ -110,7 +122,6 @@ function stop() {
 		$("#stopButton").text("START");
 	}
 };
-
 
 
 navigator.mediaDevices.getUserMedia(constraints).then(handleSuccess).catch(handleError);
